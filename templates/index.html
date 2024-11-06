@@ -1,0 +1,61 @@
+{% extends "layout.html" %}
+
+{% block title %}Meme{% endblock %}
+
+{% block content %}
+<div class="container text-center">
+  <div class="row">
+    <div class="col">
+      Column 1
+    </div>
+
+    <div class="col memes">
+      <h1>Random Memes</h1>
+      {% if memes %}
+        <div class="row">
+          {% for meme in memes %}
+            <div class="col-md-4 mb-4">
+              <div class="card">
+                <img src="{{ meme.url }}" class="card-img-top" alt="{{ meme.title }}">
+                <div class="card-body">
+                  <h5 class="card-title">{{ meme.title }}</h5>
+                  <p class="card-text">Source: <a href="{{ meme.permalink }}">{{ meme.permalink }}</a></p>
+                </div>
+              </div>
+            </div>
+          
+            <button id="save-memes-btn" class="btn btn-primary mt-4">Save</button>
+    
+            <!-- Display result message -->
+            <div id="result-message" class="mt-4"></div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p>No memes available.</p>
+      {% endif %}
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#save-memes-btn').click(function() {
+                $.ajax({
+                    url: '/save_memes',
+                    type: 'POST',
+                    success: function(response) {
+                        // Show success message
+                        $('#result-message').html('<div class="alert alert-success">' + response.message + '</div>');
+                    },
+                    error: function(xhr, status, error) {
+                        // Show error message
+                        $('#result-message').html('<div class="alert alert-danger">Error: ' + xhr.responseJSON.error + '</div>');
+                    }
+                });
+            });
+        });
+    </script>
+    <div class="col">
+      Column 3
+    </div>
+  </div>
+</div>
+{% endblock %}

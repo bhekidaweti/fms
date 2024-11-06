@@ -1,0 +1,71 @@
+{% extends "layout.html" %}
+
+{% block title %}Meme{% endblock %}
+
+{% block content %}
+<div class="container text-center">
+    <h1 class="mt-5">Saved Memes</h1>
+    <button id="save-memes-btn" class="btn btn-primary mt-4">Save New Memes</button>
+
+    <!-- Result message display -->
+    <div id="result-message" class="mt-4"></div>
+
+    <!-- Container for displaying saved memes -->
+    <div id="memes-container" class="row mt-4">
+        <!-- Memes will be dynamically inserted here -->
+    </div>
+</div>
+
+<script>
+    $(document).ready(function() {
+        // Function to fetch and display memes
+        function displayMemes() {
+            $.ajax({
+                url: '/memes',
+                type: 'GET',
+                success: function(response) {
+                    let memeHtml = '';
+                    response.forEach(function(meme) {
+                        memeHtml += `
+                            <div class="col-4 mb-4">
+                                <img src="${meme.url}" alt="${meme.title}" class="img-fluid">
+                                <h5>${meme.title}</h5>
+                                <p><a href="${meme.permalink}" target="_blank">Source</a></p>
+                            </div>
+                        `;
+                    });
+                    $('#memes-container').html(memeHtml);
+                },
+                error: function(xhr, status, error) {
+                    $('#result-message').html('<div class="alert alert-danger">Error loading memes: ' + xhr.responseText + '</div>');
+                }
+            });
+        }
+
+        // Trigger to save new memes
+        $('#save-memes-btn').click(function() {
+            $.ajax({
+                url: '/save_memes',
+                type: 'POST',
+                success: function(response) {
+                    $('#result-message').html('<div class="alert alert-success">' + response.message + '</div>');
+                    displayMemes(); // Fetch and display saved memes after successful save
+                },
+                error: function(xhr, status, error) {
+                    $('#result-message').html('<div class="alert alert-danger">Error: ' + xhr.responseJSON.error + '</div>');
+                }
+            });
+        });
+
+        // Initially display saved memes when the page loads
+        displayMemes();
+    });
+</script>
+{% endblock %}
+
+
+
+
+
+
+
